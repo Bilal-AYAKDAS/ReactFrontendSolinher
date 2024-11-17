@@ -1,0 +1,8 @@
+.sidebar .nav-link {
+  color: black !important;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #e2e6ea; /* Hover'da açık bir gri renk */
+  color: #343a40;
+}
