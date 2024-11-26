@@ -7,6 +7,11 @@ import {
 } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './SideBar.css';
+import { IoIosHome } from "react-icons/io";
+import { FaRobot } from "react-icons/fa";
+import { MdFavorite } from "react-icons/md";
+import { VscAccount } from "react-icons/vsc";
+
 
 
 function Sidebar() {
@@ -23,19 +28,16 @@ function Sidebar() {
       >
         <Nav vertical color="light">
           <NavItem className='menu'>
-            <NavLink href="../home">Home</NavLink>
+            <NavLink href="../"><IoIosHome /> Home</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/questions">Questions</NavLink>
+            <NavLink href="/myQuestions"><VscAccount /> My Questions</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/topics">Topics</NavLink>
+            <NavLink href="/favoriQuestions"> <MdFavorite style={{marginRight:"5px"}}/> Favorites</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/favorites">Favorites</NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink href="/solinhereAI">SolinHere AI</NavLink>
+            <NavLink href="/solinherAI"><FaRobot style={{marginRight:"5px"}}/>Solinher AI</NavLink>
           </NavItem>
         </Nav>
       </div>

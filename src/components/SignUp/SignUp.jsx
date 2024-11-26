@@ -14,19 +14,30 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import alertify from "alertifyjs";
-import UserMenu from "./UserMenu";
+import UserMenu from "../UserMenu/UserMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { userSignUp ,fetchUserData} from "../../redux/userSlice";
+import { FaUser  } from "react-icons/fa";
+
+
+
 
 function SignUp() {
-  const [userIsLogedIn,setUserIsLogedIn] = useState(false);
-  const userName = "Kullanıcı Adı";
+  const dispatch = useDispatch();
+  const { isLoggedIn,userName, loading, error } = useSelector((state) => state.user); // Redux durumlarını çekiyoruz
+
   const [modalOpen, setModalOpen] = useState(false);
   const toggleModal = () => setModalOpen(!modalOpen);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
+
   useEffect(() => {
-    getTokenFromLocalStorage(); // Sayfa yüklendiğinde token kontrolünü yap
-  }, []);
+    if (isLoggedIn) {
+      // Kullanıcı giriş yaptıysa fetchUserData'yı çağır
+      dispatch(fetchUserData());
+    }
+  }, [dispatch, isLoggedIn]); 
 
   const [formData, setFormData] = useState({
     email: "",
@@ -36,7 +47,7 @@ function SignUp() {
     last_name: "",
     role: "",
     profile_picture: "",
-    receive_email_notifications: false
+    receive_email_notifications: false,
   });
 
   const handleChange = (event) => {
@@ -47,73 +58,25 @@ function SignUp() {
     }));
   };
 
-
-  const handleResponse = (response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    const error = response.text();
-    throw new Error(error);
-  };
-
-  const handleError = (error) => {
-    console.log("Bir Hata oluştu");
-    throw error;
-  };
-
-  const userSignUpApi = (userInfo) => {
-    console.log(userInfo);
-    return fetch("http://127.0.0.1:8000/api/auth/register/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userInfo),
-    })
-      .then(handleResponse)
-      .catch(handleError);
-  };
-
-  const userSignUp = () => {
-    const userInfo = formData;
-    return userSignUpApi(userInfo)
-      .then((userToken) => {
-        localStorage.setItem("accessToken", userToken.access);
-        localStorage.setItem("refreshToken", userToken.refresh);
-        setUserIsLogedIn(true);
-        alertify.success("User created successfully!");
+  const handleSignUp = () => {
+    dispatch(userSignUp(formData))
+      .unwrap()
+      .then(() => {
+        alertify.success("User registered successfully!");
         setModalOpen(false);
-        
       })
-      .catch((error) => {
-        throw error;
+      .catch((err) => {
+        alertify.error(err || "An error occurred during registration.");
       });
   };
 
-  const getTokenFromLocalStorage = () =>{
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    if(accessToken!=null && refreshToken !=null){
-      setUserIsLogedIn(true);
-    }
-  }
-
-
-
-
-  // const getUserInfo
- 
-
-  //user token varmı diye kontrol et
-  //user token varsa user bilgilerini çek
-  //username userName değişkenine ata
-  //user girişini bu değişkene ata
-
-  
 
   return (
     <div>
-      {userIsLogedIn ? (
+      {isLoggedIn ? (
         <Dropdown isOpen={dropdownOpen} toggle={toggle} className="ms-3">
           <DropdownToggle caret color="light">
+          <FaUser  />
             {userName}
           </DropdownToggle>
           <UserMenu/>
@@ -220,7 +183,7 @@ function SignUp() {
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={userSignUp}>
+          <Button color="primary" onClick={handleSignUp}>
             Register
           </Button>
         </ModalFooter>

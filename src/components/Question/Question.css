@@ -1,0 +1,16 @@
+
+  .align-right {
+    margin-left: auto;
+  }
+  .icon-size{
+    width: 20px;
+    height: 20px;
+  }
+  .like-btn{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5px;
+    padding: 5px 8px;
+    font-size: 10px;
+  }

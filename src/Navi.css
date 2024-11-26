@@ -1,9 +1,0 @@
-.search-input {
-  margin-left: 150px; /* Sağa kaydırmak için */
-  width: 400px  !important;      /* Boyutu genişletmek için */
-  height: 40px;      /* Yüksekliği büyütmek için */
-}
-.searchBtn{
-  margin-left: 5px;
-  height: 40px;
-}
