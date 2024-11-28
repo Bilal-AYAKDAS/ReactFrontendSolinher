@@ -1,41 +1,53 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  FormGroup,
-  Label,
-  Input,
-  ModalFooter,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   Button,
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+  Box,
+} from "@mui/material";
 import alertify from "alertifyjs";
-import "./AddAnswer.css";
+import { useDispatch } from "react-redux";
+import { fetchQuestionDetail } from "../../redux/questionDetailSlice";
 import apiClient from "../../api/apiClient";
 
-
-function AddAnswer({ question }) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const toggleModal = () => setModalOpen(!modalOpen);
-
+function AddAnswer({ isEdit = false, answer = {}, questionId, onClose }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [body, setBody] = useState(""); // Cevap metni
-  const [questionId, setQuestionId] = useState(null); // Soru ID
 
-  // Bileşen yüklendiğinde veya `question` değiştiğinde gerekli verileri ayarla
+  const dispatch = useDispatch();
+
+  // Edit modunda mevcut cevabı yükle
   useEffect(() => {
-    if (question) {
-      setQuestionId(question);
+    if (isEdit && answer) {
+      setBody(answer.body || "");
+      setDialogOpen(true); // Düzenleme modunda modal otomatik açılır
     }
-  }, [question]);
-console.log(questionId)
- 
-  // Cevabı kaydetmek için API çağrısı
+  }, [isEdit, answer]);
+
+  // Modalı aç/kapat
+  const toggleDialog = () => {
+    setDialogOpen(!dialogOpen);
+    if (onClose) onClose(); // Modal kapandığında üst bileşene haber ver
+  };
+
+  // Cevap kaydetme veya düzenleme API çağrısı
   const saveAnswerApi = async (answerInfo) => {
     try {
-      const response = await apiClient.post("/questions/create-comment/", answerInfo);
-      alertify.success("Successfully added your answer!");
+      const url = isEdit
+        ? `/questions/edit-comment/${answer.id}`
+        : `/questions/create-comment/`;
+      const response = isEdit
+        ? await apiClient.patch(url, answerInfo)
+        : await apiClient.post(url, answerInfo);
+
+      alertify.success(
+        isEdit
+          ? "Successfully updated your answer!"
+          : "Successfully added your answer!"
+      );
       return response.data;
     } catch (error) {
       console.error("Error saving answer:", error.response?.data || error.message);
@@ -44,8 +56,10 @@ console.log(questionId)
     }
   };
 
-  // Cevap kaydetme işlemi
+  // Cevap kaydetme/düzenleme işlemi
   const saveAnswer = async () => {
+    console.log(questionId)
+
     if (!body || !questionId) {
       alertify.error("Please fill in the required fields.");
       return;
@@ -58,40 +72,57 @@ console.log(questionId)
 
     try {
       await saveAnswerApi(answerInfo);
-      setModalOpen(false); // Modal'ı kapat
+      setDialogOpen(false); // Modal'ı kapat
+      dispatch(fetchQuestionDetail(questionId)); // Redux üzerinden detayları yenile
+      if (onClose) onClose(); // Modal kapandığında üst bileşene haber ver
     } catch (error) {
       console.error("Failed to save answer:", error);
+      alertify.error("Failed to save answer.");
     }
   };
 
   return (
-    <div>
-        <Button color="success" onClick={toggleModal}>
-        <FontAwesomeIcon icon={faPlus} className="me-3" />
+    <Box>
+      {/* Add/Edit Answer Button */}
+      {!isEdit && (
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => setDialogOpen(true)}
+        >
           Add Answer
         </Button>
-      <Modal isOpen={modalOpen} toggle={toggleModal} size="lg">
-        <ModalHeader toggle={toggleModal}>Add Answer</ModalHeader>
-        <ModalBody>
-          <FormGroup floating>
-            <Input
-              className={"textarea-size"}
-              type="textarea"
-              name="answerText"
-              id="answerText"
-              placeholder="Enter your answerText"
-              onChange={(e)=>setBody(e.target.value)}
-            />
-            <Label for="answerText">Answer</Label>
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={saveAnswer}>
-            Save
+      )}
+
+      {/* Modal (Dialog) */}
+      <Dialog open={dialogOpen} onClose={toggleDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{isEdit ? "Edit Answer" : "New Answer"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            multiline
+            rows={4}
+            variant="outlined"
+            fullWidth
+            label="Answer Text"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Enter your answer"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={toggleDialog}
+          >
+            Cancel
           </Button>
-        </ModalFooter>
-      </Modal>
-    </div>
+          <Button variant="contained" color="primary" onClick={saveAnswer}>
+            {isEdit ? "Update" : "Save"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
 

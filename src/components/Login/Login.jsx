@@ -1,24 +1,30 @@
-import { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  FormGroup,
-  Label,
-  Input,
-  ModalFooter,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   Button,
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+} from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useDispatch, useSelector } from "react-redux";
-import { userLogin, logout,checkToken } from "../../redux/userSlice";
-
+import { userLogin, logout, checkToken } from "../../redux/userSlice";
 
 function Login() {
   const dispatch = useDispatch();
 
   const { isLoggedIn, loading, error } = useSelector((state) => state.user);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Sayfa yüklendiğinde `checkToken` çağrılır
+  useEffect(() => {
+    dispatch(checkToken());
+  }, [dispatch]);
 
   const handleLogin = () => {
     dispatch(userLogin({ email, password }));
@@ -28,77 +34,77 @@ function Login() {
     dispatch(logout());
   };
 
-  // Sayfa yüklendiğinde `checkToken`'ı çağır
-  useEffect(() => {
-    dispatch(checkToken());
-  }, [dispatch]);
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const toggleModal = () => setModalOpen(!modalOpen);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-    }
+  const toggleDialog = () => {
+    setDialogOpen(!dialogOpen);
   };
-  
 
   return (
     <div>
       {isLoggedIn ? (
-         <Button color="danger"
-         onClick={handleLogout}>
-         <FontAwesomeIcon
-           icon={faSignOutAlt}
-           className="me-3"
-         />Logout
-       </Button>
-        
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ml:1}}
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       ) : (
-        <Button color="success" onClick={toggleModal}>
-        <FontAwesomeIcon icon={faUser} className="me-3" />
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ml:1}}
+          startIcon={<AccountCircleIcon />}
+          onClick={toggleDialog}
+        >
           Login
         </Button>
       )}
 
-      <Modal isOpen={modalOpen} toggle={toggleModal}>
-        <ModalHeader toggle={toggleModal}>Login</ModalHeader>
-        <ModalBody>
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="email"
-              id="email"
-              placeholder="Enter your email"
-              onChange={handleChange}
-            />
-            <Label for="email">Email</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Enter your password"
-              onChange={handleChange}
-            />
-            <Label for="password">Password</Label>
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={handleLogin}>
-            Login
+      <Dialog open={dialogOpen} onClose={toggleDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>Login</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+          />
+          {error && (
+            <p style={{ color: "red", marginTop: "10px" }}>
+              {error || "Login failed. Please try again."}
+            </p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={toggleDialog} color="secondary">
+            Cancel
           </Button>
-        </ModalFooter>
-      </Modal>
+          <Button
+            onClick={handleLogin}
+            color="primary"
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
-
 export default Login;
-

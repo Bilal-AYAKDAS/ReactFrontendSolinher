@@ -1,43 +1,32 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  FormGroup,
-  Label,
-  Input,
-  ModalFooter,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   Button,
-  Dropdown,
-  DropdownToggle,
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import alertify from "alertifyjs";
-import UserMenu from "../UserMenu/UserMenu";
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  Box,
+} from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch, useSelector } from "react-redux";
-import { userSignUp ,fetchUserData} from "../../redux/userSlice";
-import { FaUser  } from "react-icons/fa";
-
-
-
+import { userSignUp, fetchUserData } from "../../redux/userSlice";
+import alertify from "alertifyjs";
 
 function SignUp() {
   const dispatch = useDispatch();
-  const { isLoggedIn,userName, loading, error } = useSelector((state) => state.user); // Redux durumlarını çekiyoruz
+  const { isLoggedIn, userName } = useSelector((state) => state.user);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const toggleModal = () => setModalOpen(!modalOpen);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggle = () => setDropdownOpen((prevState) => !prevState);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      // Kullanıcı giriş yaptıysa fetchUserData'yı çağır
-      dispatch(fetchUserData());
-    }
-  }, [dispatch, isLoggedIn]); 
+  const openMenu = Boolean(anchorEl);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -49,6 +38,20 @@ function SignUp() {
     profile_picture: "",
     receive_email_notifications: false,
   });
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserData());
+    }
+  }, [dispatch, isLoggedIn]);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -70,124 +73,135 @@ function SignUp() {
       });
   };
 
-
   return (
     <div>
       {isLoggedIn ? (
-        <Dropdown isOpen={dropdownOpen} toggle={toggle} className="ms-3">
-          <DropdownToggle caret color="light">
-          <FaUser  />
+        <Box display="flex" alignItems="center">
+          <IconButton onClick={handleMenuClick}>
+            <AccountCircleIcon fontSize="large" />
+          </IconButton>
+          <Typography variant="body1" sx={{ ml: 1,mr:2 }}>
             {userName}
-          </DropdownToggle>
-          <UserMenu/>
+          </Typography>
+          <Menu
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleMenuClose}
+            PaperProps={{
+              sx: { width: 100 }, // Menü genişliği
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+          >
+            <MenuItem>
+              <Typography variant="body1">Profile</Typography>
+            </MenuItem>
+            <MenuItem>
+              <Typography variant="body1">Settings</Typography>
+            </MenuItem>
           
-        </Dropdown>
+          </Menu>
+        </Box>
       ) : (
-        <Button color="warning" onClick={toggleModal}>
-          <FontAwesomeIcon icon={faUser} className="me-3" />
+        <Button variant="contained" color="success" onClick={() => setModalOpen(true)}>
           Sign Up
         </Button>
       )}
-      <Modal isOpen={modalOpen} toggle={toggleModal}>
-        <ModalHeader toggle={toggleModal}>Register</ModalHeader>
 
-        <ModalBody>
-          {/* Register form fields */}
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="email"
-              id="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <Label for="email">Email</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <Label for="password">Password</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="password"
-              name="password2"
-              id="password2"
-              placeholder="Confirm your password"
-              value={formData.password2}
-              onChange={handleChange}
-            />
-            <Label for="password2">Confirm Password</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="first_name"
-              id="first_name"
-              placeholder="Enter your first name"
-              value={formData.first_name}
-              onChange={handleChange}
-            />
-            <Label for="first_name">First Name</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="last_name"
-              id="last_name"
-              placeholder="Enter your last name"
-              value={formData.last_name}
-              onChange={handleChange}
-            />
-            <Label for="last_name">Last Name</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="role"
-              id="role"
-              placeholder="Enter your role"
-              value={formData.role}
-              onChange={handleChange}
-            />
-            <Label for="role">Role</Label>
-          </FormGroup>
-          <FormGroup floating>
-            <Input
-              type="text"
-              name="profile_picture"
-              id="profile_picture"
-              placeholder="Enter profile picture URL"
-              value={formData.profile_picture}
-              onChange={handleChange}
-            />
-            <Label for="profile_picture">Profile Picture URL</Label>
-          </FormGroup>
-          <FormGroup check>
-            <Label check>
-              <Input
-                type="checkbox"
-                name="receive_email_notifications"
+      <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Register</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Confirm Password"
+            name="password2"
+            type="password"
+            value={formData.password2}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="First Name"
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Last Name"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Profile Picture URL"
+            name="profile_picture"
+            value={formData.profile_picture}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
                 checked={formData.receive_email_notifications}
                 onChange={handleChange}
+                name="receive_email_notifications"
               />
-              Receive Email Notifications
-            </Label>
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={handleSignUp}>
+            }
+            label="Receive Email Notifications"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSignUp} color="primary" variant="contained">
             Register
           </Button>
-        </ModalFooter>
-      </Modal>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

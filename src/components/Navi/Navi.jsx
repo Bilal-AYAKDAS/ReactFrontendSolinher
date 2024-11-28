@@ -13,9 +13,7 @@ import Login from "../Login/Login";
 import SignUp from "../SignUp/SignUp";
 import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 function Navi() {
-
   
-
   return (
     <AppBar position="static" color="default" elevation={1}  >
       <Toolbar sx={{ justifyContent: "space-between" }}>

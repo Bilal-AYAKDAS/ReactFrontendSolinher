@@ -118,6 +118,7 @@ function Question({ question }) {
             </div>
 
            {/* Detaylar ve Düzenleme */}
+           
         <div>
          
   {location.pathname === "/myQuestions" ? (
