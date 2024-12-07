@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,20 +13,41 @@ import {
   MenuItem,
   Typography,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch, useSelector } from "react-redux";
 import { userSignUp, fetchUserData } from "../../redux/userSlice";
 import alertify from "alertifyjs";
+import Profile from "../Profile/Profile";
+import ChangePassword from "../ChangePassword/ChangePassword";
 
 function SignUp() {
+  debugger;
+
   const dispatch = useDispatch();
-  const { isLoggedIn, userName } = useSelector((state) => state.user);
+  const { isLoggedIn, userData } = useSelector((state) => state.user);
+  let userName ="";
+ if(userData !=null){
+  userName =`${userData.first_name} ${userData.last_name}`;
+ }
 
   const [modalOpen, setModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-
   const openMenu = Boolean(anchorEl);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [changePasswdOpen, setChangePasswdOpen] = useState(false);
+  
+  const handleFileChange = (event) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      profile_picture: event.target.files[0], // Seçilen dosyayı al
+    }));
+  };
+
 
   const [formData, setFormData] = useState({
     email: "",
@@ -35,7 +56,7 @@ function SignUp() {
     first_name: "",
     last_name: "",
     role: "",
-    profile_picture: "",
+    profile_picture: null,
     receive_email_notifications: false,
   });
 
@@ -52,6 +73,7 @@ function SignUp() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  const inputRef = useRef();
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -61,17 +83,33 @@ function SignUp() {
     }));
   };
 
-  const handleSignUp = () => {
-    dispatch(userSignUp(formData))
-      .unwrap()
-      .then(() => {
-        alertify.success("User registered successfully!");
-        setModalOpen(false);
-      })
-      .catch((err) => {
-        alertify.error(err || "An error occurred during registration.");
+  const handleSignUp = async () => {
+    try {
+      await dispatch(userSignUp(formData)).unwrap();
+      alertify.success("Kayıt başarılı!");
+    } catch (err) {
+      console.log("Hata Detayları:", err);
+    // Hata mesajları
+      Object.entries(err).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          alertify.error(`${field}: ${messages.join(", ")}`);
+        } else {
+          alertify.error(`${field}: ${messages}`);
+        }
       });
+     }
   };
+
+  const handleButtonClick = () => {
+    inputRef.current.click(); // Gizli input alanını tetikle
+  };
+  
+  const handleProfileClose = () => setProfileOpen(false);
+
+  
+  const handleChangePasswdClose = () => setChangePasswdOpen(false);
+
+ 
 
   return (
     <div>
@@ -88,7 +126,7 @@ function SignUp() {
             open={openMenu}
             onClose={handleMenuClose}
             PaperProps={{
-              sx: { width: 100 }, // Menü genişliği
+              sx: { width: 155 }, // Menü genişliği
             }}
             transformOrigin={{
               vertical: "top",
@@ -100,19 +138,23 @@ function SignUp() {
             }}
           >
             <MenuItem>
-              <Typography variant="body1">Profile</Typography>
+              <Typography variant="body1" onClick={()=>setProfileOpen(true)}>Profile</Typography>
             </MenuItem>
             <MenuItem>
-              <Typography variant="body1">Settings</Typography>
+              <Typography variant="body1" onClick={()=>setChangePasswdOpen(true)}>Change Password</Typography>
             </MenuItem>
-          
           </Menu>
+          
         </Box>
+           
       ) : (
         <Button variant="contained" color="success" onClick={() => setModalOpen(true)}>
           Sign Up
         </Button>
       )}
+      <Profile open={profileOpen} onClose={handleProfileClose} ></Profile>
+      <ChangePassword open={changePasswdOpen} onClose={handleChangePasswdClose}  ></ChangePassword>
+
 
       <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Register</DialogTitle>
@@ -164,24 +206,35 @@ function SignUp() {
             onChange={handleChange}
             variant="outlined"
           />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            variant="outlined"
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Profile Picture URL"
-            name="profile_picture"
-            value={formData.profile_picture}
-            onChange={handleChange}
-            variant="outlined"
-          />
+          <FormControl fullWidth >
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              value={formData.role}
+              name="role"
+              onChange={handleChange}
+            >
+              <MenuItem value="employee">Employee</MenuItem>
+              <MenuItem value="engineer">Engineer</MenuItem>
+              <MenuItem value="HR">HR</MenuItem>
+            </Select>
+          </FormControl>
+          <Box display="flex" alignItems="center" gap={2} flexWrap="wrap" sx={{ mt: 2 }}>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <Button variant="contained" color="primary" onClick={handleButtonClick}>
+              Choose File
+            </Button>
+            <Typography variant="body2" sx={{ color: formData.profile_picture ? "inherit" : "#aaa" }}>
+              {formData.profile_picture?.name || "No file selected"}
+            </Typography>
+          </Box>
+
           <FormControlLabel
             control={
               <Checkbox

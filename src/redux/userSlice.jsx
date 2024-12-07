@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../api/apiClient";
 
 const initialState = {
-  userName: "",
+  userData: null,
   isLoggedIn: false,
   accessToken: null,
   refreshToken: null,
@@ -15,10 +15,23 @@ export const userSignUp = createAsyncThunk(
   "user/signUp",
   async (userInfo, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/auth/register/", userInfo);
+      const response = await apiClient.post("/auth/register/", userInfo, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data; // API'den dönen yanıt
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Bir hata oluştu");
+       // Hata durumlarını işleme
+       const errorData = error.response?.data || {};
+       const errorMessage = error.response?.statusText || "Bir hata oluştu";
+ 
+       // Kullanıcıya gösterilecek hata detaylarını döndür
+       return rejectWithValue({
+         status: error.response?.status || 500,
+         message: errorMessage,
+         details: errorData,
+       });
     }
   }
 );
@@ -28,11 +41,18 @@ export const userLogin = createAsyncThunk(
   "user/login",
   async (userInfo, { rejectWithValue }) => {
     try {
+      debugger;
       const response = await apiClient.post("/auth/login/", userInfo);
-      const data = response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Bir hata oluştu");
+        // Hata durumlarını işleme
+        const errorData = error.response?.data || {};
+        const errorMessage = error.response?.statusText || "Bir hata oluştu";
+        return rejectWithValue({
+          status: error.response?.status || 500,
+          message: errorMessage,
+          details: errorData,
+        });
     }
   }
 );
@@ -59,8 +79,8 @@ export const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get("/auth/retrieve/"); // Token otomatik eklenecek
-      return response.data.first_name + " " + response.data.last_name;
+      const response = await apiClient.get("/auth/retrieve/"); 
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Bir hata oluştu");
     }
@@ -75,7 +95,7 @@ const userSlice = createSlice({
       state.isLoggedIn = false;
       state.accessToken = null;
       state.refreshToken = null;
-      state.userName = "";
+      state.userData = "";
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
     },
@@ -97,6 +117,9 @@ const userSlice = createSlice({
       })
       .addCase(userLogin.rejected, (state, action) => {
         state.loading = false;
+        state.isLoggedIn=false;
+        state.accessToken = null;
+        state.refreshToken =null;
         state.error = action.payload;
       })
 
@@ -132,7 +155,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.userName = action.payload; // Kullanıcı adını state'e kaydet
+        state.userData = action.payload; // Kullanıcı adını state'e kaydet
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;

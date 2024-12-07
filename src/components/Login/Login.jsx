@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,24 +11,46 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import { userLogin, logout, checkToken } from "../../redux/userSlice";
+import alertify from "alertifyjs";
 
 function Login() {
   const dispatch = useDispatch();
 
   const { isLoggedIn, loading, error } = useSelector((state) => state.user);
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+
 
   // Sayfa yüklendiğinde `checkToken` çağrılır
   useEffect(() => {
     dispatch(checkToken());
   }, [dispatch]);
+ 
+  const handleLogin = async () => {
+    try {
+      await dispatch(userLogin({ email, password })).unwrap();
+      alertify.success("Succesfully Login!");
+    } catch (err) {
+      console.log("Hata Detayları:", err);
 
-  const handleLogin = () => {
-    dispatch(userLogin({ email, password }));
+      if (err?.details?.non_field_errors) {
+        alertify.error(err.details.non_field_errors.join(", "));
+      } else {
+        alertify.error("Login failed. Please check your credentials.");
+      }
+      
+      // Yönlendirmeyi biraz geciktirin
+      setTimeout(() => {
+        location.href = "/";
+      }, 300); // 3 saniye bekleme
+
+
+     }
   };
+
+
 
   const handleLogout = () => {
     dispatch(logout());
