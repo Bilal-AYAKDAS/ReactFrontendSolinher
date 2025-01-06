@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   TextField,
@@ -9,6 +9,9 @@ import {
   Stack,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import apiClient from "../../api/apiClient";
+
+
 
 function Chatbot() {
   const [messages, setMessages] = useState([
@@ -16,17 +19,34 @@ function Chatbot() {
   ]);
   const [input, setInput] = useState('');
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === '') return;
+
+    // Add user message to the chat
     setMessages([...messages, { sender: 'user', text: input }]);
+    const userMessage = input;
     setInput('');
-    // Bot response simulation
-    setTimeout(() => {
+
+    try {
+      // Create FormData and add the input
+      const formData = new FormData();
+      formData.append('query', userMessage);
+
+      // Make the POST request with query parameters and formData
+      const response = await apiClient.post(`/ai/rag-search/`, formData);
+
+      // Add bot response to the chat
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: 'bot', text: 'Thank you for your message!' },
+        { sender: 'bot', text: response.data.response || 'Sorry, I could not understand.' },
       ]);
-    }, 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: 'bot', text: 'There was an error processing your message. Please try again.' },
+      ]);
+    }
   };
 
   return (

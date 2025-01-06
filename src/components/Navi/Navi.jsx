@@ -8,7 +8,6 @@ import {
   Box,
   Select,
   MenuItem,
-  Chip,
   FormControl,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -75,23 +74,15 @@ function Navi() {
             marginX: 2,
           }}
         >
-          <FormControl sx={{ marginLeft: 0, minWidth: 300, maxWidth: 300 }}>
+          <FormControl sx={{ marginLeft: 0, minWidth: 150, maxWidth: 170 }}>
             <Select
               multiple
               value={selectedTags}
               onChange={(e)=> setSelectedTags(e.target.value)}
               displayEmpty
-              renderValue={(selected) => {
-                if (selected.length === 0) {
+              renderValue={() => {
                   return <span style={{ color: "#aaa" }}>Tags...</span>; // Placeholder
-                }
-                return (
-                  <Box display="flex" flexWrap="wrap" gap={1}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                );
+                
               }}
             >
               {tagOptions.map((tag) => (

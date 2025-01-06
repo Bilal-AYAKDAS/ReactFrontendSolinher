@@ -32,6 +32,7 @@ function Login() {
     try {
       await dispatch(userLogin({ email, password })).unwrap();
       alertify.success("Succesfully Login!");
+      toggleDialog();
     } catch (err) {
       console.log("Hata Detayları:", err);
 

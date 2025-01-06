@@ -62,7 +62,6 @@ function AddQuestion({ isEdit = false, question = {}, onClose }) {
           response = await apiClient.post(url, questionInfo);
         }
 
-      alertify.success(response.data.message);
       return response.data;
     } catch (error) {
       console.error("Error saving question:", error.response?.data || error.message);

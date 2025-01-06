@@ -87,6 +87,7 @@ function SignUp() {
     try {
       await dispatch(userSignUp(formData)).unwrap();
       alertify.success("Kayıt başarılı!");
+      setModalOpen(false);
     } catch (err) {
       console.log("Hata Detayları:", err);
     // Hata mesajları

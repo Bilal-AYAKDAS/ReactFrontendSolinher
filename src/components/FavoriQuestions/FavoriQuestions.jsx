@@ -8,7 +8,7 @@ function FavoriQuestions() {
 
   const getQuestions = async()=>{
   //Buraya local storageden userTokenı alıp header olarak ekle ve yolla kullanıcıya ait sorular gelsin
-  const data = await apiClient.get("/questions/list-questions/");
+  const data = await apiClient.get("/questions/favorited-questions/");
     setQuestionApi(data.data);
   }
 
