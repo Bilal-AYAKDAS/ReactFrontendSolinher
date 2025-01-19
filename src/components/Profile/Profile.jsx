@@ -126,7 +126,10 @@ function Profile({ open, onClose }) {
             >
               <MenuItem value="employee">Employee</MenuItem>
               <MenuItem value="engineer">Engineer</MenuItem>
-              <MenuItem value="HR">HR</MenuItem>
+              <MenuItem value="manager">Manager</MenuItem>
+              <MenuItem value="operator">Operator</MenuItem>
+              <MenuItem value="technician">Technician</MenuItem>
+              <MenuItem value="hr">Human Resource</MenuItem>
             </Select>
           </FormControl>
           <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">

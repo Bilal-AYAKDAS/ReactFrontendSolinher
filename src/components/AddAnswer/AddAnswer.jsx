@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   Box,
+  Typography,
 } from "@mui/material";
 import alertify from "alertifyjs";
 import { useDispatch } from "react-redux";
@@ -16,6 +17,7 @@ import apiClient from "../../api/apiClient";
 function AddAnswer({ isEdit = false, answer = {}, questionId, onClose }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [body, setBody] = useState(""); // Cevap metni
+  const [hasAccessToken, setHasAccessToken] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -26,6 +28,11 @@ function AddAnswer({ isEdit = false, answer = {}, questionId, onClose }) {
       setDialogOpen(true); // Düzenleme modunda modal otomatik açılır
     }
   }, [isEdit, answer]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    setHasAccessToken(!!token); // Eğer token varsa `true` yap
+  }, []);
 
   // Modalı aç/kapat
   const toggleDialog = () => {
@@ -81,47 +88,57 @@ function AddAnswer({ isEdit = false, answer = {}, questionId, onClose }) {
     }
   };
 
+  const renderWithoutAccessToken = () => (
+    <>
+    </>
+  );
+  const renderWithAccessToken = () => (
+    <Box>
+    {/* Add/Edit Answer Button */}
+    {!isEdit && (
+      <Button
+        variant="contained"
+        color="success"
+        onClick={() => setDialogOpen(true)}
+      >
+        Add Answer
+      </Button>
+    )}
+
+    {/* Modal (Dialog) */}
+    <Dialog open={dialogOpen} onClose={toggleDialog} maxWidth="sm" fullWidth>
+      <DialogTitle>{isEdit ? "Edit Answer" : "New Answer"}</DialogTitle>
+      <DialogContent>
+        <TextField
+          multiline
+          rows={4}
+          variant="outlined"
+          fullWidth
+          label="Answer Text"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Enter your answer"
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={toggleDialog}
+        >
+          Cancel
+        </Button>
+        <Button variant="contained" color="primary" onClick={saveAnswer}>
+          {isEdit ? "Update" : "Save"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </Box>
+  );
+
   return (
     <Box>
-      {/* Add/Edit Answer Button */}
-      {!isEdit && (
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => setDialogOpen(true)}
-        >
-          Add Answer
-        </Button>
-      )}
-
-      {/* Modal (Dialog) */}
-      <Dialog open={dialogOpen} onClose={toggleDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{isEdit ? "Edit Answer" : "New Answer"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            label="Answer Text"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="Enter your answer"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={toggleDialog}
-          >
-            Cancel
-          </Button>
-          <Button variant="contained" color="primary" onClick={saveAnswer}>
-            {isEdit ? "Update" : "Save"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {hasAccessToken ? renderWithAccessToken() : renderWithoutAccessToken()}
     </Box>
   );
 }
