@@ -84,7 +84,9 @@ function AddQuestion({ isEdit = false, question = {}, onClose }) {
 
       // Redux üzerinden soruları yenile
       dispatch(fetchQuestionsByUser());
-
+      setTitle("");
+      setBody("");
+      setTags([]);
       if (onClose) onClose(); // Modal kapandığında üst bileşene haber ver
     } catch (error) {
       console.error("Failed to save question:", error);

@@ -32,8 +32,12 @@ function Login() {
     try {
       await dispatch(userLogin({ email, password })).unwrap();
       alertify.success("Succesfully Login!");
+      setEmail("");
+      setPassword("");
       toggleDialog();
     } catch (err) {
+      setEmail("");
+      setPassword("");
       console.log("Hata Detayları:", err);
 
       if (err?.details?.non_field_errors) {
