@@ -25,7 +25,6 @@ import Profile from "../Profile/Profile";
 import ChangePassword from "../ChangePassword/ChangePassword";
 
 function SignUp() {
-  debugger;
 
   const dispatch = useDispatch();
   const { isLoggedIn, userData } = useSelector((state) => state.user);

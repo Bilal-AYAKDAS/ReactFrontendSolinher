@@ -5,14 +5,12 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Select,
-  MenuItem,
   Chip,
-  InputLabel,
   FormControl,
   Button,
   Box,
   Card,
+  Autocomplete,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -127,27 +125,25 @@ function AddQuestion({ isEdit = false, question = {}, onClose }) {
               onChange={(e) => setTitle(e.target.value)}
             />
             <FormControl fullWidth>
-              <InputLabel id="tags-label">Tags</InputLabel>
-              <Select
-                labelId="tags-label"
+              <Autocomplete
                 multiple
+                freeSolo
+                options={tagOptions}
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                renderValue={(selected) => (
-                  <Box display="flex" flexWrap="wrap" gap={1}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {tagOptions.map((tag) => (
-                  <MenuItem key={tag} value={tag}>
-                    {tag}
-                  </MenuItem>
-                ))}
-              </Select>
+                onChange={(event, newValue) => setTags(newValue)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip key={index}
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => <TextField {...params} label="Tags" />}
+              />
             </FormControl>
+
             <TextField
               label="Description"
               variant="outlined"
