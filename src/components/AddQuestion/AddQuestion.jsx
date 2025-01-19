@@ -25,8 +25,8 @@ function AddQuestion({ isEdit = false, question = {}, onClose }) {
   const [body, setBody] = useState("");
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState([]);
+  const [tagOptions, setTagOptions] = useState([]);
 
-  const tagOptions = ["Java", "Maven", "Gradle", "Spring", "Hibernate"];
 
   // Edit modunda gelen verileri doldur
   useEffect(() => {
@@ -37,6 +37,25 @@ function AddQuestion({ isEdit = false, question = {}, onClose }) {
       setDialogOpen(true); // Dialog'u aç
     }
   }, [isEdit, question]);
+
+  useEffect(() => {
+    fetchTags(); // Sayfa yüklendiğinde her zaman çalışsın
+  }, []);
+  
+  const fetchTags =  async () => {
+    try {
+      const response = await apiClient.get("/questions/all-tags/");
+      console.log("response", response.data);
+      let tags_array =[];
+      response.data.map((tag) => {
+        tags_array.push(tag.name);
+      });
+
+      setTagOptions(tags_array);
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
 
   const toggleDialog = () => {
     setDialogOpen(!dialogOpen);

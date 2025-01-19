@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   CardActions,
@@ -17,10 +17,12 @@ import { useDispatch } from "react-redux";
 import { fetchQuestionDetail } from "../../redux/questionDetailSlice";
 import AddAnswer from "../AddAnswer/AddAnswer";
 import apiClient from "../../api/apiClient";
+import { use } from "react";
 
 function Answer({ answer, questionId }) {
   const [editOpen, setEditOpen] = useState(false); // Modal kontrolü için state
   const dispatch = useDispatch();
+  const [userName, setUserName] = useState("Unknown");
 
   const handleEditClick = () => {
     setEditOpen(true); // Modal'ı aç
@@ -52,6 +54,23 @@ function Answer({ answer, questionId }) {
     }
   };
 
+  const getUserName = async (userId) => {
+    try {
+      const response = await apiClient.get(`/auth/user/${userId}`);
+      console.log("response", response.data);
+      setUserName(response.data.first_name+ " "+ response.data.last_name);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      setUserName("Unknown");
+    }
+  };
+  
+  useEffect(() => {
+    getUserName(answer.user);
+  }, []);
+
+  
+
   return (
     <div>
       <Card sx={{ padding: 2 }} style={{ width: "65rem", height: "15rem" }}>
@@ -68,7 +87,7 @@ function Answer({ answer, questionId }) {
             <strong>Answer Text:</strong> {answer.body}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>Answered By:</strong> {answer.user}
+            <strong>Answered By:</strong> {userName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <strong>Date:</strong> {format(new Date(answer.created_at), "PPpp")}

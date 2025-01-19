@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -18,11 +18,12 @@ import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import { useDispatch } from "react-redux";
 import { fetchFilteredQuestions } from "../../redux/questionsSlice";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/apiClient";
 
 function Navi() {
   const [search,setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
-  const tagOptions = ["Java", "Maven", "Gradle", "Spring", "Hibernate"];
+  const [tagOptions, setTagOptions] = useState([]);
 
   const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -38,7 +39,25 @@ function Navi() {
 
   }
   
+  const fetchTags =  async () => {
+    try {
+      const response = await apiClient.get("/questions/all-tags/");
+      console.log("response", response.data);
+      let tags_array =[];
+      response.data.map((tag) => {
+        tags_array.push(tag.name);
+      });
 
+      setTagOptions(tags_array);
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+  
   return (
     <AppBar position="static" color="default" elevation={1}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
