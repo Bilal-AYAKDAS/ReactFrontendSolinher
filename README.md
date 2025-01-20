@@ -31,7 +31,22 @@ Solinher is a **corporate information-sharing and solution platform** designed t
 
 ## 📂 Project Structure
 
-solinher-frontend/ │── src/ │ ├── components/ # Reusable UI components │ ├── pages/ # Application pages │ ├── redux/ # State management (Redux) │ ├── api/ # API calls (Axios) │ ├── utils/ # Helper functions │ ├── styles/ # Material UI styles │ ├── assets/ # Static assets (icons, images) │ ├── main.jsx # Vite entry file │ ├── App.jsx # Main app component │── public/ │── .env # Environment variables │── vite.config.js # Vite configuration │── package.json # Dependencies and scripts │── README.md # Project documentation
+- **`src/`** - Source code directory
+  - **`components/`** - Reusable UI components
+  - **`pages/`** - Application pages
+  - **`redux/`** - State management (Redux)
+  - **`api/`** - API calls (Axios)
+  - **`utils/`** - Helper functions
+  - **`styles/`** - Material UI styles
+  - **`assets/`** - Static assets (icons, images)
+  - **`main.jsx`** - Vite entry file
+  - **`App.jsx`** - Main app component
+- **`public/`** - Public assets
+- **`.env`** - Environment variables
+- **`vite.config.js`** - Vite configuration
+- **`package.json`** - Dependencies and scripts
+- **`README.md`** - Project documentation
+
 
 ## 📜 Installation & Setup
 
@@ -40,4 +55,27 @@ solinher-frontend/ │── src/ │ ├── components/ # Reusable UI compon
 git clone https://github.com/Bilal-AYAKDAS/ReactFrontendSolinheR.git
 cd solinher-frontend
 
+2️⃣ Install Dependencies
+```sh
+npm install
 
+3️⃣ Run the Development Server
+```sh
+npm run dev
+
+⚡ Why Vite?
+This project is built with Vite, offering:
+
+Ultra-fast development with instant hot module replacement (HMR).
+Optimized production builds for better performance.
+Modern ES Module support and faster startup times.
+🛡 Security & Best Practices
+✅ Authentication: Secure JWT-based authentication.
+🔐 Protected Routes: Only logged-in users can access certain pages.
+📜 Error Handling: Friendly error messages for better UX.
+🏗 Code Structure: Modular and scalable design.
+🤝 Contributors
+👤 Bilal Ayakdaş - Frontend Development
+
+📜 License
+This project is licensed under the MIT License.
