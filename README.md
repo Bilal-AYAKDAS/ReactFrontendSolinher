@@ -51,7 +51,7 @@ Solinher is a **corporate information-sharing and solution platform** designed t
 ## 📜 Installation & Setup
 
 1️⃣ **Clone the Repository**
-
+```sh
 git clone https://github.com/Bilal-AYAKDAS/ReactFrontendSolinher.git
 cd ReactFrontendSolinher
 
