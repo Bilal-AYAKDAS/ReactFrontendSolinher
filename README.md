@@ -60,20 +60,32 @@ npm install
 
 3️⃣ Run the Development Server
 npm run dev
+```
 
-⚡ Why Vite?
-This project is built with Vite, offering:
+## ⚡ Why Vite?
 
-Ultra-fast development with instant hot module replacement (HMR).
-Optimized production builds for better performance.
-Modern ES Module support and faster startup times.
-🛡 Security & Best Practices
-✅ Authentication: Secure JWT-based authentication.
-🔐 Protected Routes: Only logged-in users can access certain pages.
-📜 Error Handling: Friendly error messages for better UX.
-🏗 Code Structure: Modular and scalable design.
-🤝 Contributors
-👤 Bilal Ayakdaş - Frontend Development
+This project is built with **Vite**, offering:
 
-📜 License
-This project is licensed under the MIT License.
+- ⚡ **Ultra-fast development** with instant hot module replacement (HMR).
+- 🚀 **Optimized production builds** for better performance.
+- 📦 **Modern ES Module support** and faster startup times.
+
+---
+
+## 🛡 Security & Best Practices
+
+- ✅ **Authentication:** Secure JWT-based authentication.
+- 🔐 **Protected Routes:** Only logged-in users can access certain pages.
+- 📜 **Error Handling:** Friendly error messages for better UX.
+- 🏗 **Code Structure:** Modular and scalable design.
+
+---
+
+## 🤝 Contributor
+
+- 👤 **Bilal Ayakdaş** - *Frontend Development*  
+
+---
+
+
+
