@@ -32,18 +32,18 @@ Solinher is a **corporate information-sharing and solution platform** designed t
 ## 📂 Project Structure
 
 - **`src/`** - Source code directory
-  - **`components/`** - Reusable UI components
-  - **`pages/`** - Application pages
-  - **`redux/`** - State management (Redux)
   - **`api/`** - API calls (Axios)
+  - **`assets/`** - Static assets (icons, images)
+  - **`components/`** - Reusable UI components
+  - **`redux/`** - State management (Redux)
   - **`utils/`** - Helper functions
   - **`styles/`** - Material UI styles
-  - **`assets/`** - Static assets (icons, images)
   - **`main.jsx`** - Vite entry file
   - **`App.jsx`** - Main app component
+  - **`index.css`** - Vite entry file
+  - **`App.css`** - Main app component
 - **`public/`** - Public assets
-- **`.env`** - Environment variables
-- **`vite.config.js`** - Vite configuration
+- **`eslint.config.js`** - Vite configuration
 - **`package.json`** - Dependencies and scripts
 - **`README.md`** - Project documentation
 
